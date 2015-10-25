@@ -26,20 +26,19 @@ data Ordering = LT | EQ | GT
 -- Classes --
 
 class Eq a where
-	(==),(\=) :: a -> a -> Bool
+	(==),(/=) :: a -> a -> Bool
 
-	x == y = not (x \= y)
-	x \= y = not (x == y)
+	x == y = not (x /= y)
+	x /= y = not (x == y)
 
-class Ord a where
+class (Eq a) => Ord a where
 	(<),(<=),(>=),(>) :: a -> a -> Bool
 	compare 		  :: a -> a -> Ordering
 
 	a <  b = compare a b == LT
-	a <= b = compare a b \= GT
-	a >= b = compare a b \= LT
+	a <= b = compare a b /= GT
+	a >= b = compare a b /= LT
 	a >  b = compare a b == GT
-
 
 class Show a where
 	show :: a -> String
@@ -62,7 +61,7 @@ instance Eq Ordering where
 instance Eq Char where
 	-- Err...	
 
-instance (Eq a, Ord a) => Eq [a] where
+instance (Eq a) => Eq [a] where
 	[] == []         = True
 	[] == _          = False
 	_  == []         = False
@@ -135,6 +134,7 @@ f $ x = f x
 (.) :: (b -> c) -> (a -> b) -> (a -> c)
 (f . g) x = f (g x)
 
+-- print :: (Show a) => a -> GHC.Types.IO ()
 -- print = putStrLn . show
 -- Not entirely sure why this doesn't work.
 
@@ -150,26 +150,22 @@ reverse :: [a] -> [a]
 reverse = foldl (flip (:)) [] -- Nice way to check foldl
 
 all :: (a -> Bool) -> [a] -> Bool
-all _ [] = True
+all _       []  = True
 all pred (x:xs) = case (pred x) of
 	True  -> all pred xs
 	False -> False
 
 any :: (a -> Bool) -> [a] -> Bool
-any _ [] = False
+any _       []  = False
 any pred (x:xs) = case (pred x) of
 	False -> any pred xs
 	True  -> True
 
 scanl :: (b -> a -> b) -> b -> [a] -> [b]
-scanl _ acc [] = [acc]
+scanl _ acc    []  = [acc]
 scanl f acc (x:xs) = f acc x : scanl f (f acc x) xs
 
 -- Required functions -- 
-
-foldl :: (b -> a -> b) -> b -> [a] -> b
-foldl _ acc []     = acc
-foldl f acc (x:xs) = foldl f (f acc x) xs
 
 takeWhile :: (a -> Bool) -> [a] -> [a]
 takeWhile _       []  = []
@@ -182,6 +178,10 @@ filter _       []  = []
 filter pred (x:xs) = case (pred x) of
 	True  -> x : filter pred xs
 	False ->     filter pred xs
+
+foldl :: (b -> a -> b) -> b -> [a] -> b
+foldl _ acc []     = acc
+foldl f acc (x:xs) = foldl f (f acc x) xs
 
 foldr :: (a -> b -> b) -> b -> [a] -> b
 foldr _ acc    []  = acc
@@ -202,6 +202,9 @@ sort (x:xs) =
 -- define ordering on Char without refering to Enum and 
 -- Int and all sorts of crap I don't want to go near.
 
+-- :t main -> main :: GHC.Types.IO (), according to GHCi.
+-- However in defining print, GHCi complains that 
+-- GHC.Types.IO is not in scope.
 main = putStrLn . show $ sort [LT,GT,EQ,LT,EQ]
 
 -- Ok, the problem is definitely in trying to call the
