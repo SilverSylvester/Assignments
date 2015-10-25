@@ -99,7 +99,7 @@ instance Show Char where
 
 instance (Show a) => Show [a] where
 	show [] = "[]"
-	show (x:xs) = "[" ++ show x ++ (concatMap ((',':) . show) xs) ++ "]"
+	show (x:xs) = "[" ++ show x ++ concatMap ((',':) . show) xs ++ "]"
 
 instance Show Ordering where
 	show LT = "LT"
@@ -138,7 +138,7 @@ f $ x = f x
 -- print = putStrLn . show
 -- Not entirely sure why this doesn't work.
 
--- Other functions --
+-- Test functions --
 
 flip :: (a -> b -> c) -> (b -> a -> c)
 flip f x y = f y x
@@ -148,6 +148,22 @@ const a _ = a
 
 reverse :: [a] -> [a]
 reverse = foldl (flip (:)) [] -- Nice way to check foldl
+
+all :: (a -> Bool) -> [a] -> Bool
+all _ [] = True
+all pred (x:xs) = case (pred x) of
+	True  -> all pred xs
+	False -> False
+
+any :: (a -> Bool) -> [a] -> Bool
+any _ [] = False
+any pred (x:xs) = case (pred x) of
+	False -> any pred xs
+	True  -> True
+
+scanl :: (b -> a -> b) -> b -> [a] -> [b]
+scanl _ acc [] = [acc]
+scanl f acc (x:xs) = f acc x : scanl f (f acc x) xs
 
 -- Required functions -- 
 
