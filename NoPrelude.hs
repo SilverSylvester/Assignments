@@ -181,7 +181,11 @@ iterate f x = x : scanl (const . f) x [1..]
    	x : f x : f (f x) : ... , as required.
 
    	There are easier ways to define this:
-   	iterate f x = x : iterate f (f x), 
+   	iterate f x = x : iterate f (f x)
+   	
+   	I just find it strange that I can even use [1..],
+   	considering that nothing pertaining to it has been
+   	explicitly imported.
 
 -}
 
