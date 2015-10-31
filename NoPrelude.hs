@@ -23,6 +23,10 @@ import System.IO (putStrLn)
 data Bool = False | True
 data Ordering = LT | EQ | GT
 
+-- Type synonyms --
+
+type String = [Char]
+
 -- Classes --
 
 class Eq a where
@@ -42,8 +46,6 @@ class (Eq a) => Ord a where
 
 class Show a where
 	show :: a -> String
-
-type String = [Char]
 
 -- Instances --
 
@@ -84,7 +86,7 @@ instance Ord Ordering where
 	compare GT _  = GT
 	compare _  GT = LT
 
-instance (Eq a, Ord a) => Ord [a] where
+instance (Ord a) => Ord [a] where
 	compare [] [] = EQ
 	compare _  [] = LT
 	compare [] _  = GT
@@ -163,7 +165,25 @@ any pred (x:xs) = case (pred x) of
 
 scanl :: (b -> a -> b) -> b -> [a] -> [b]
 scanl _ acc    []  = [acc]
-scanl f acc (x:xs) = f acc x : scanl f (f acc x) xs
+scanl f acc (x:xs) = f acc x : scanl f (f acc x) xs 
+
+iterate :: (a -> a) -> a -> [a]
+iterate f x = x : scanl (const . f) x [1..]
+{- Explanation:
+
+	const :: a -> b -> a
+	f     :: a -> a
+   	const . f == \x -> const (f x)
+   	Note that this function still needs one more parameter,
+   	since const takes two but is only supplied one. This
+   	extra parameter is the list value, which is discarded.
+   	Repeated application therefore gives:
+   	x : f x : f (f x) : ... , as required.
+
+   	There are easier ways to define this:
+   	iterate f x = x : iterate f (f x), 
+
+-}
 
 -- Required functions -- 
 
