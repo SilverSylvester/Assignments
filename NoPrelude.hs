@@ -168,7 +168,7 @@ scanl _ acc    []  = [acc]
 scanl f acc (x:xs) = f acc x : scanl f (f acc x) xs 
 
 iterate :: (a -> a) -> a -> [a]
-iterate f x = x : scanl (const . f) x [1..]
+iterate f x = scanl (const . f) x [1..]
 {- Explanation:
 
 	const :: a -> b -> a
