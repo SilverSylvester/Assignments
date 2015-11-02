@@ -15,7 +15,6 @@ filter' pred (x:xs)
 	| otherwise =     filter' pred xs
 
 gcd' :: (Integral a) => a -> a -> a
-gcd' 0 0 = error "gcd(0,0) is undefined"
 gcd' a 0 = a
 gcd' a b = gcd' b (mod a b)
 
