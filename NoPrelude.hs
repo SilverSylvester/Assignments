@@ -1,3 +1,5 @@
+{- CONOR REYNOLDS -- 14412408 -}
+
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module NoPrelude where
@@ -12,11 +14,8 @@ import System.IO (putStrLn)
 -- import GHC.Types   (Bool, Ordering)
 
 -- Note that the interpreter will get angry at you for trying
--- to print most things unless you put 'putStrLn . show $ '
--- directly before it. I can't define 'print' in file without
--- generating an error, I'm not sure why. Using it in main
--- seems to be fine. Perhaps the fact that I'm calling it print
--- is causing problems?
+-- to print most things unless you put 'print $ ' directly 
+-- before it. More info at the definition of 'print'.
 
 -- Datatypes --
 
@@ -60,9 +59,6 @@ instance Eq Ordering where
 	GT == GT = True
 	_  == _  = False
 
-instance Eq Char where
-	-- Err...	
-
 instance (Eq a) => Eq [a] where
 	[] == []         = True
 	[] == _          = False
@@ -72,10 +68,9 @@ instance (Eq a) => Eq [a] where
 		False -> False
 
 instance Ord Bool where
-	compare False False = EQ
 	compare False True  = LT
 	compare True  False = GT
-	compare True  True  = EQ
+	compare _     _     = EQ
 
 instance Ord Ordering where
 	compare LT LT = EQ
@@ -118,7 +113,7 @@ not False = True
 not True = False
 
 (++) :: [a] -> [a] -> [a]
-[] ++ ys         = ys
+[] ++ ys     = ys
 (x:xs) ++ ys = x : (xs ++ ys)
 
 concat :: [[a]] -> [a]
@@ -128,6 +123,7 @@ map :: (a -> b) -> [a] -> [b]
 map _ [] = []
 map f (x:xs) = f x : map f xs
 
+concatMap :: (a -> [b]) -> [a] -> [b]
 concatMap f = concat . map f
 
 ($) :: (a -> b) -> (a -> b)
@@ -136,9 +132,14 @@ f $ x = f x
 (.) :: (b -> c) -> (a -> b) -> (a -> c)
 (f . g) x = f (g x)
 
--- print :: (Show a) => a -> GHC.Types.IO ()
--- print = putStrLn . show
--- Not entirely sure why this doesn't work.
+print x = putStrLn $ (show x :: String)
+-- The function wouldn't work without specifying
+-- explicitly the return type of 'show', not entirely
+-- sure why. Also, using the default GHCi print (as
+-- in, just typing something into the interpreter and
+-- pressing enter) doesn't work, due to a lack of a
+-- GHC.Show.Show instance; but this hasn't been
+-- imported.
 
 -- Test functions --
 
@@ -149,7 +150,8 @@ const :: a -> b -> a
 const a _ = a
 
 reverse :: [a] -> [a]
-reverse = foldl (flip (:)) [] -- Nice way to check foldl
+reverse = foldl (flip (:)) []
+-- Nice way to check foldl
 
 all :: (a -> Bool) -> [a] -> Bool
 all _       []  = True
@@ -169,23 +171,25 @@ scanl f acc (x:xs) = f acc x : scanl f (f acc x) xs
 
 iterate :: (a -> a) -> a -> [a]
 iterate f x = scanl (const . f) x [1..]
-{- Explanation:
+{-
+	Explanation:
 
 	const :: a -> b -> a
 	f     :: a -> a
-   	const . f == \x -> const (f x)
-   	Note that this function still needs one more parameter,
-   	since const takes two but is only supplied one. This
-   	extra parameter is the list value, which is discarded.
-   	Repeated application therefore gives:
-   	x : f x : f (f x) : ... , as required.
+	const . f == \x -> const (f x)
+	Note that this function still needs one more parameter,
+	since const takes two but is only supplied one. This
+	extra parameter is the list value, which is discarded.
+	Repeated application therefore gives:
+	x : f x : f (f x) : ... , as required.
 
    	There are easier ways to define this:
-   	iterate f x = x : iterate f (f x)
+   	iterate f x = x : iterate f (f x), but my way is more
+   	fun.
    	
    	I just find it strange that I can even use [1..],
    	considering that nothing pertaining to it has been
-   	explicitly imported.
+   	explicitly imported. Probably built into the language.
 
 -}
 
@@ -222,15 +226,11 @@ sort (x:xs) =
 -- > putStrLn . show $ sort [LT,GT,EQ,EQ,GT,LT,LT]
 -- > [LT,LT,LT,EQ,EQ,GT,GT]
 
--- Can't sort Strings, mainly because I have no idea how to
--- define ordering on Char without refering to Enum and 
--- Int and all sorts of crap I don't want to go near.
+-- Or you can try printing Strings:
+-- > print "Hello"
 
--- :t main -> main :: GHC.Types.IO (), according to GHCi.
--- However in defining print, GHCi complains that 
--- GHC.Types.IO is not in scope.
-main = putStrLn . show $ sort [LT,GT,EQ,LT,EQ]
+main = print . foldr (++) [GT,GT] . map reverse . sort 
+		$ [[LT,GT],[EQ,EQ],[EQ,LT]]
 
--- Ok, the problem is definitely in trying to call the
--- function print.
+-- Should output [GT,LT,LT,EQ,EQ,EQ,GT,GT] 
 
