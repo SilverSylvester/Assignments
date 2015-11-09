@@ -1,6 +1,11 @@
 import java.util.Stack;
 import java.util.Scanner;
 
+/**
+ * The only reason I'm doing this in Java is because
+ * we needed to use stacks (and Haskell makes this
+ * ridiculously trivial).
+ */
 public class HR_Lab6_Practice {
 	public static void main(String[] args) {
 		
