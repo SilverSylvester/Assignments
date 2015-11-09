@@ -1,4 +1,4 @@
-module HR_Lab4_Practice where
+module HR_Lab5_Practice where
 
 import Control.Monad (replicateM)
 import Data.List (sort)
