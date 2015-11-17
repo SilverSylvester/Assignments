@@ -3,7 +3,7 @@ module HR_Lab6 where
 import Control.Monad (replicateM)
 
 main = readLn >>= (flip replicateM) getLine >>= \cmds ->
-    print' . maximum' $ parseIn (map words cmds) $ []
+    print' . maximum' . parseIn (map words cmds) $ []
         where print' (Just a) = print a
               print' _        = putStrLn "empty"
 
@@ -12,9 +12,9 @@ main = readLn >>= (flip replicateM) getLine >>= \cmds ->
 
 parseIn :: [[String]] -> ([Int] -> [Int])
 parseIn [] = id
-parseIn (x:xs)
-    | head x == "PUSH" = parseIn xs . ((read (last x) :: Int):)
-    | head x == "POP"  = parseIn xs . tail'
-    | otherwise        = id
+parseIn (xs:xss)
+    | head xs == "PUSH" = parseIn xss . ((read (last xs) :: Int):)
+    | head xs == "POP"  = parseIn xss . tail'
+    | otherwise         = id
     where tail' = drop 1
 
