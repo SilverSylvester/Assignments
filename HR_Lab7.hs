@@ -9,14 +9,14 @@ middle :: [String] -> String
 middle xs
     | null xs          = "empty"
     | even (length xs) = xs !! ((length xs) `div` 2 - 1)
-	| otherwise        = xs !! ((length xs) `div` 2)
+    | otherwise        = xs !! ((length xs) `div` 2)
 	
 parseIn :: [[String]] -> (Queue String -> Queue String)
 parseIn [] = id
 parseIn (xs:xss)
-	| head xs == "INSERT" = parseIn xss . enq (last xs)
-	| head xs == "REMOVE" = parseIn xss . deq
-	| otherwise           = id
+    | head xs == "INSERT" = parseIn xss . enq (last xs)
+    | head xs == "REMOVE" = parseIn xss . deq
+    | otherwise           = id
 
 -- Queue interface --
 
