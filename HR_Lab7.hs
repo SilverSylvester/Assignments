@@ -1,7 +1,5 @@
 module HR_Lab7 where
 
-import Control.Monad (replicateM)
-
 main = getContents >>= \cmds ->
     putStrLn . middle . toList . parseIn (map words (lines cmds)) $ empty
 
