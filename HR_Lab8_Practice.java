@@ -1,5 +1,21 @@
 import java.util.*;
 
+/*
+    Sample Input:
+
+    4
+    Data1
+    Data2
+    Data3
+    Data4
+    0 -1  1  // Current link | Previous Link | Next link
+    1  0  2
+    2  1  3
+    3  2 -1
+
+    Will output TRUE, since the list is properly connected.
+*/
+
 public class HR_Lab8_Practice {
     public static void main(String[] args)
     {
@@ -7,27 +23,27 @@ public class HR_Lab8_Practice {
         int num = Integer.parseInt(in.nextLine());
         Link[] array = new Link[num];
 
-        for(int i = 0; i < num; i++) {
-            array[i]=new Link(in.nextLine());    
+        for (int i = 0; i < num; i++) {
+            array[i] = new Link(in.nextLine());    
         }
 
-        while(in.hasNext()) {
+        while (in.hasNext()) {
             int select = in.nextInt();
             int previous = in.nextInt();
             int next = in.nextInt();
             
-            if(previous != -1) {
+            if (previous != -1) {
                 array[select].previous = array[previous];
             }
 
-            if(next != -1){
+            if (next != -1){
                 array[select].next = array[next];
             }
         }
 
         LinkedList ll = new LinkedList();
         
-        if(num > 0) {
+        if (num > 0) {
             ll.first = array[0];
             ll.last = array[num - 1];
         }
@@ -35,18 +51,19 @@ public class HR_Lab8_Practice {
         System.out.println(check(ll));
     }
 
+    // Capable of detecting infinite loops
     public static String check(LinkedList ll) {
         
         if (ll.isEmpty()) return "empty";
 
         Link f = ll.first;
 
+        if (f.previous != null) return "FALSE";
+
         /* In reality, this check is only probabilistic, failing for lists
          * that are incorrectly linked but have the same elements throughout.
-         * 
-         * It is also dependent on the size of the list.
          */
-        for (int i = 0; i < 101; i++) {
+        while (true) {
             if (f.next == null) break;
             else if (!f.data.equals(f.next.previous.data)) {
                 return "FALSE";
