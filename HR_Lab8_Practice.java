@@ -62,6 +62,9 @@ public class HR_Lab8_Practice {
 
         /* In reality, this check is only probabilistic, failing for lists
          * that are incorrectly linked but have the same elements throughout.
+         * However, considering that the only meaningful way to check for
+         * equality is by checking the data, this is the best that can be
+         * done.
          */
         while (true) {
             if (f.next == null) break;
