@@ -60,13 +60,12 @@ public class HR_Lab8_Practice {
         if (f.previous != null) return "FALSE";
 
         while (true) {
-            if (f.next == null) break;
+            if (f.next == null) return "TRUE";
             else if (f != f.next.previous) {
                 return "FALSE";
             }
             f = f.next;
         }
-        return "TRUE";
     }
 }
 
