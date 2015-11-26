@@ -51,7 +51,6 @@ public class HR_Lab8_Practice {
         System.out.println(check(ll));
     }
 
-    // Capable of detecting infinite loops
     public static String check(LinkedList ll) {
         
         if (ll.isEmpty()) return "empty";
@@ -60,15 +59,9 @@ public class HR_Lab8_Practice {
 
         if (f.previous != null) return "FALSE";
 
-        /* In reality, this check is only probabilistic, failing for lists
-         * that are incorrectly linked but have the same elements throughout.
-         * However, considering that the only meaningful way to check for
-         * equality is by checking the data, this is the best that can be
-         * done.
-         */
         while (true) {
             if (f.next == null) break;
-            else if (!f.data.equals(f.next.previous.data)) {
+            else if (f != f.next.previous) {
                 return "FALSE";
             }
             f = f.next;
