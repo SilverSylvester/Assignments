@@ -57,7 +57,7 @@ public class HR_Lab8 {
         int i = 0;
         while (true) {
             if (h == null || h.next == null)
-                break;
+                return 0;
             else if (t == h) {
                 do {
                     t = t.next;
@@ -70,7 +70,6 @@ public class HR_Lab8 {
                 h = h.next.next;
             }
         }
-        return 0;
     }
 }
 
