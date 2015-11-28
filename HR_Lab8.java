@@ -43,9 +43,10 @@ public class HR_Lab8 {
     }
 
     static int loopLength(LinkedList ll) {
-        if (ll.isEmpty()) return 0;
+        if (ll.isEmpty())
+            return 0;
+
         Link t = ll.first, h = ll.first;
-        int i = 0;
 
         if (t.next == null)
             return 0;
@@ -53,16 +54,15 @@ public class HR_Lab8 {
             h = h.next.next;
         }
 
+        int i = 0;
         while (true) {
-            if (h == null || h.next == null) {
+            if (h == null || h.next == null)
                 break;
-            }
             else if (t == h) {
                 do {
                     t = t.next;
                     i++;
                 } while (t != h);
-
                 return i;
             }
             else {
