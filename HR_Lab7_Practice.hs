@@ -1,7 +1,7 @@
 module HR_Lab7_Practice where
 
 main = getLine >>= mapM_ print . foldl (flip insertQ) [] . map readInt . words
-    where readInt = \x -> read x :: Int
+    where readInt = read :: String -> Int
     
 insertQ :: (Ord a) => a -> [a] -> [a]
 insertQ x [] = [x]

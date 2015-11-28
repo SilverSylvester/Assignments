@@ -63,7 +63,7 @@ instance (Eq a) => Eq [a] where
 	[] == []         = True
 	[] == _          = False
 	_  == []         = False
-	(x:xs) == (y:ys) = case (x == y) of
+	(x:xs) == (y:ys) = case x == y of
 		True  -> xs == ys
 		False -> False
 
@@ -85,7 +85,7 @@ instance (Ord a) => Ord [a] where
 	compare [] [] = EQ
 	compare _  [] = LT
 	compare [] _  = GT
-	compare (x:xs) (y:ys) = case (compare x y) of
+	compare (x:xs) (y:ys) = case compare x y of
 		LT -> LT
 		GT -> GT
 		EQ -> compare xs ys
@@ -132,7 +132,7 @@ f $ x = f x
 (.) :: (b -> c) -> (a -> b) -> (a -> c)
 (f . g) x = f (g x)
 
-print x = putStrLn $ (show x :: String)
+print x = putStrLn (show x :: String)
 -- The function wouldn't work without specifying
 -- explicitly the return type of 'show', not entirely
 -- sure why. Also, using the default GHCi print (as
@@ -155,13 +155,13 @@ reverse = foldl (flip (:)) []
 
 all :: (a -> Bool) -> [a] -> Bool
 all _       []  = True
-all pred (x:xs) = case (pred x) of
+all pred (x:xs) = case pred x of
 	True  -> all pred xs
 	False -> False
 
 any :: (a -> Bool) -> [a] -> Bool
 any _       []  = False
-any pred (x:xs) = case (pred x) of
+any pred (x:xs) = case pred x of
 	False -> any pred xs
 	True  -> True
 
@@ -229,7 +229,7 @@ sort (x:xs) =
 -- Or you can try printing Strings:
 -- > print "Hello"
 
-main = print . foldr (++) [GT,GT] . map reverse . sort 
+main = print . foldr ((++) . reverse) [GT,GT] . sort 
 		$ [[LT,GT],[EQ,EQ],[EQ,LT]]
 
 -- Should output [GT,LT,LT,EQ,EQ,EQ,GT,GT] 

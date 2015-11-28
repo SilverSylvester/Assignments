@@ -12,7 +12,7 @@ primesTo m = eratos [2..m] where
 
 -- Almost set difference. Can deal with infinite lists in arg2.
 minus :: (Ord a) => [a] -> [a] -> [a]
-minus (x:xs) (y:ys) = case (compare x y) of
+minus (x:xs) (y:ys) = case compare x y of
 	LT -> x : minus xs  (y:ys)
 	EQ ->     minus xs     ys
 	GT ->     minus (x:xs) ys
@@ -22,5 +22,5 @@ minus xs _ = xs
 -- iterate through entire list.
 closest :: (Integral a) => a -> [a] -> a
 closest _ [] = error "Nothing to compare to"
-closest n xs = foldl1 (\x y -> if (abs (x - n) > abs (y - n)) then y else x) xs
+closest n xs = foldl1 (\x y -> if abs (x - n) > abs (y - n) then y else x) xs
 
