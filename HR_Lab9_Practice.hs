@@ -11,6 +11,7 @@ birthday n = 1 - (365 `pick` (365 - n + 1)) // (365^n)
 pick :: (Integral a) => a -> a -> a
 n `pick` k = product [k..n]
 
+-- Ensures minimal loss of floating point precision
 (//) :: (Fractional a) => Integer -> Integer -> a
 a // b = fromRational (a % b)
 
