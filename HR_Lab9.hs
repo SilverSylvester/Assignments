@@ -16,5 +16,5 @@ main' = getContents >>= print . (\(x:y:_) -> gcd' x y) . map readInteger . lines
 
 gcd' :: (Integral a) => a -> a -> a
 gcd' a 0 = a
-gcd' a b = gcd b (mod a b)
+gcd' a b = gcd' b (mod a b)
 
