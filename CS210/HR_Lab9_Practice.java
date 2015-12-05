@@ -21,19 +21,14 @@ public class HR_Lab9_Practice {
     /* Calculates the probability directly */
     static double birthday2(int n) {
         
-        double value;
-        int x = n;
-        
-        if (x > 1) {
-            return 1 - birthday(-n);
+        if (n > 0) {
+            return 1 - birthday2(-n);
         }
-        else if (x == -1) {
+        else if (n == -1) {
             return 1;
         }
         else {
-            value = ((365 + (double)x + 1) / 365);
-            x++;
-        }
-        return value*birthday(x);
+            return (365 + (double)n + 1) / 365 * birthday2(n + 1);
+        }  
     }
 }
