@@ -1,8 +1,8 @@
+module HR_Lab4 where
 
-main = do
-	n <- readLn
-	let ans = closest n $ primesTo $ 2*n
-	print ans
+import Control.Monad (ap)
+
+main = readLn >>= print . ap closest (primesTo . (2*))
 
 -- All primes LEQ to given integer.
 primesTo :: Integer -> [Integer]
