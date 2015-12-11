@@ -8,9 +8,7 @@ msort :: (Ord a) => [a] -> [a]
 msort xs
     | not (null $ tail xs) = merge (msort ls) (msort rs)
     | otherwise            = xs
-    where (ls,rs) = split xs
-          split xs = (take n xs, drop n xs)
-              where n = length xs `div` 2
+    where (ls,rs) = splitAt (length xs `div` 2) xs
 
           merge    []     ys  = ys
           merge    xs     []  = xs
