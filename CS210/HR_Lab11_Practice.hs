@@ -19,6 +19,5 @@ fromBase10 b n = read . reverse . snd . runWriter $ fromBase10' b n
     where fromBase10' b n
               | n == 0    = return b
               | otherwise = let (q,r) = n `quotRem` b
-                            in do tell (show r)
-                                  fromBase10' b q
+                            in tell (show r) >> fromBase10' b q
 
