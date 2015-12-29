@@ -3,4 +3,21 @@ Assignments for CS225, CS210 and CS211
 --------------------
 Does exactly what it says on the tin.
 
-Some code may not look precisely as intended, since tab is four spaces in my editor, but eight spaces in GitHub. Simply append `?ts=4` to the URL to change the tab size.
+###### Testing some Markdown features:
+
+Code blocks:
+
+```
+reverse :: [a] -> [a]
+reverse = foldl (flip (:)) []
+
+fromBase10 :: Integer -> Integer -> Integer
+fromBase10 _ 0 = 0
+fromBase10 b n = read . reverse . snd . runWriter $ fromBase10' b n
+    where fromBase10' b n
+              | n == 0    = return b
+              | otherwise = let (q,r) = n `quotRem` b
+                            in tell (show r) >> fromBase10' b q
+
+```
+
