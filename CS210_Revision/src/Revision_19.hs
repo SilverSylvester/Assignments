@@ -1,15 +1,14 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Revision_19 where
 
 import Data.List (sortBy)
+import qualified Data.ByteString.Char8 as BC
 
-main = getLine >> getContents
-    >>= mapM_ putStrLn . sortBy comp . lines
+main = BC.getLine >> BC.getContents
+    >>= mapM_ BC.putStrLn . sortBy comp . BC.lines
 
-comp :: (Ord a) => [a] -> [a] -> Ordering
+comp :: BC.ByteString -> BC.ByteString -> Ordering
 comp a b =
-    case compare (maximum a) (maximum b) of
+    case compare (BC.maximum a) (BC.maximum b) of
         LT -> LT
         GT -> GT
         _  -> compare a b
