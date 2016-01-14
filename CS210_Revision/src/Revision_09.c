@@ -70,13 +70,6 @@ int main(int argc, char *argv[])
             in = calloc(21, sizeof(char));
             scanf("%s", in);
             enq(in, q);
-            /* Problem was this line: `free(in)`.
-             * Since I was passing the queue a *pointer* to
-             * the data stored at `in`, when free(in) was
-             * called, it was destroying that reference,
-             * bascially obliterating the data. Calling
-             * free was unnecessary anyway since it's freed
-             * on free(q) (I think). */
         }
         else if (strcmp("REMOVE", cmd) == 0
                 && !is_empty(q)) {
