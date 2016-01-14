@@ -50,16 +50,24 @@ bool is_empty(Queue *q)
     return q->last < q->first;
 }
 
+void queue_destruct(Queue *q)
+{
+    for (int i = 0; i < MAX_SIZE; i++) {
+        free(q->queue[i]);
+    }
+    free(q);
+}
+
 int main(int argc, char *argv[])
 {
     Queue *q = queue_init();
     char *cmd, *in;
     
     for (int i = 0; i < 20; i++) {
-        cmd = malloc(7);
+        cmd = calloc(7, sizeof(char));
         scanf("%s", cmd);
         if (strcmp("INSERT", cmd) == 0) {
-            in = malloc(21);
+            in = calloc(21, sizeof(char));
             scanf("%s", in);
             enq(in, q);
             /* Problem was this line: `free(in)`.
@@ -80,7 +88,7 @@ int main(int argc, char *argv[])
     if (is_empty(q)) printf("empty\n");
     else printf("%s\n", deq(q));
     
-    free(q);
+    queue_destruct(q);
 
     return 0;
 }
