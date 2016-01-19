@@ -10,30 +10,44 @@
 struct Stack
 {
     int head;
+    int size;
     char *stack;
 };
 
 typedef struct Stack Stack;
 
-Stack *stk_init()
+Stack *stack_init(int size)
 {
-    Stack *stk = malloc(sizeof(Stack));
-    assert(stk != NULL);
-    
-    stk->head = -1;
-    stk->stack = malloc(MAX_STK_SIZE * sizeof(char));
-    return stk;
+    Stack *s = malloc(sizeof(Stack));
+    assert(s != NULL);
+
+    s->size = size;
+    s->stack = malloc(size * sizeof(int));
+    assert(s->stack != NULL);
+
+    s->head = -1;
+    return s;
 }
 
-void stk_destruct(Stack *s)
+void stack_destruct(Stack *s)
 {
     free(s->stack);
     free(s);
 }
 
+void stack_realloc(Stack *s)
+{
+    s->size *= 2;
+    char *new_stack = realloc(s->stack, s->size * sizeof(int));
+    s->stack = new_stack;
+    assert(s->stack != NULL);
+}
+
 void push(char c, Stack *s)
 {
-    assert(s->head < MAX_STK_SIZE);
+    if ((s->size - 1) <= s->head)
+        stack_realloc(s);
+
     s->stack[++s->head] = c;
 }
 
@@ -52,18 +66,18 @@ bool is_empty(Stack *s)
 
 bool is_palin(char *str)
 {
-    Stack *rts = stk_init();
+    Stack *rts = stack_init(MAX_STK_SIZE);
     for (int i = 0; i < strlen(str); i++) {
         push(str[i], rts);
     }
-    
+
     int i = 0; bool b = true;
     while (!is_empty(rts)) {
         if (pop(rts) != str[i++])
             b = false; break;
     }
-    
-    stk_destruct(rts);
+
+    stack_destruct(rts);
     return b;
 }
 
@@ -77,7 +91,7 @@ void format_string(char *s)
         if(*i != ' ') i++;
     }
     *i = 0;
-    
+
     // Convert to lower case
     for ( ; *s; s++) *s = tolower(*s);
 }
@@ -87,10 +101,9 @@ int main(int argc, char *argv[])
     char *s = malloc(MAX_STK_SIZE * sizeof(char));
     fgets(s, MAX_STK_SIZE, stdin);
     format_string(s);
-    
+
     if (is_palin(s)) printf("TRUE\n");
     else printf("FALSE\n");
-    
+
     free(s);
 }
-
