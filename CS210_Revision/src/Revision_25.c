@@ -22,7 +22,7 @@ Stack *stack_init(int size)
     assert(s != NULL);
 
     s->size = size;
-    s->stack = malloc(size * sizeof(int));
+    s->stack = malloc(size * sizeof(char));
     assert(s->stack != NULL);
 
     s->head = -1;
@@ -38,7 +38,7 @@ void stack_destruct(Stack *s)
 void stack_realloc(Stack *s)
 {
     s->size *= 2;
-    char *new_stack = realloc(s->stack, s->size * sizeof(int));
+    char *new_stack = realloc(s->stack, s->size * sizeof(char));
     s->stack = new_stack;
     assert(s->stack != NULL);
 }
