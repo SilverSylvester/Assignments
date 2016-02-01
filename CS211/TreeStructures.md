@@ -76,11 +76,25 @@ In Haskell:
 insertT :: (Ord a) => a -> Tree a -> Tree a
 insertT x Null = Node x Null Null
 insertT x (Node a l r)
-    | x < a     = insertT x l
-    | x > a     = insertT x r
+    | x < a     = Node a (insertT x l) r
+    | x > a     = Node a l (insertT x r)
     | otherwise = Node a l r
 
 ```
 
 In C (do this later)
+
+Convert BT to ordered list
+--------------------------
+
+```java
+void someOrder(Node root) {
+    if (root != null) {
+        someOrder(root.left);
+        someOrder(root.right);
+        System.out.println(root.data);
+    }
+}
+
+```
 
