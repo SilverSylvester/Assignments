@@ -4,7 +4,7 @@ fn main() {
     let mut n = String::new();
     io::stdin().read_line(&mut n).expect("Failure: read_line");
 
-    match n.parse::<u32> {
+    match n.parse::<u32>() {
         Ok(i) => println!("{:.3}", 1f32 - birthday(i)),
         Err(..) => println!("Attempted to parse: \"{}\"", n)
     };

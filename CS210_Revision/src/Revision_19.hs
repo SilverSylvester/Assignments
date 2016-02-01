@@ -12,4 +12,4 @@ comp a b =
         LT -> LT
         GT -> GT
         _  -> compare a b
-
+        
