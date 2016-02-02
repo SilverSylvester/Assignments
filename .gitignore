@@ -53,3 +53,7 @@ dist-test
 # TODO file
 TODO.md
 
+# Extras
+*.pdf
+/CS211/*.md
+
