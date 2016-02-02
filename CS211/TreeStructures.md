@@ -25,7 +25,7 @@ class Node {
 
 ```
 
-Or in a real language:
+Or in C:
 
 ```c
 typedef struct Node
@@ -52,20 +52,35 @@ Finding a particular node in a tree
 In Java:
 
 ```java
-Node find(int key) {
-    Node current = root;
+Node search(int key) {
+    Node c = root;
     while (true) {
-        if (key < current.data)
-            current = current.left;
-        else if (key > current.data)
-            current = current.right;
-        else return current;
+        if (key < c.data)
+            c = c.left;
+        else if (key > c.data)
+            c = c.right;
+        else return c;
     }
 }
 
 ```
 
-This is pretty much the same for any language.
+And a recursive implementation in C++:
+
+```cpp
+Node *Tree::search(int key, Node *c)
+{
+    if (c != NULL) {
+        if (key < c->data)
+            return search(key, c->l);
+        else if (key > c->data)
+            return search(key, c->r);
+        else
+            return c;
+    }
+}
+
+```
 
 Inserting a value into a tree
 -----------------------------
@@ -82,19 +97,53 @@ insertT x (Node a l r)
 
 ```
 
-In C (do this later)
+\pagebreak
 
-Convert BT to ordered list
---------------------------
+In C++:
 
-```java
-void someOrder(Node root) {
-    if (root != null) {
-        someOrder(root.left);
-        someOrder(root.right);
-        System.out.println(root.data);
+```cpp
+void Tree::insert(int key, Node *c)
+{
+    if (key < c->data) {
+        if (c->l != NULL)
+            insert(key, c->l);
+        else {
+            c->l = new Node;
+            c->l->data = key;
+            c->l->l = NULL;
+            c->l->r = NULL;
+        }
+    }
+    else if (key > c->data) {
+        if (c->r != NULL) {
+            insert(key, c->r);
+        }
+        else {
+            c->r = new Node;
+            c->r->data = key;
+            c->r->l = NULL;
+            c->r->r = NULL;
+        }
     }
 }
 
 ```
+
+Convert BT to ordered list
+--------------------------
+
+Depth first in-order traversal in Java:
+
+```java
+void inOrder(Node root) {
+    if (root != null) {
+        inOrder(root.left);
+        System.out.println(root.data);
+        inOrder(root.right);
+    }
+}
+
+```
+
+Much the same in any language.
 
