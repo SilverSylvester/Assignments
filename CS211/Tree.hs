@@ -2,13 +2,13 @@ module Tree where
 
 import Control.Monad
 import Data.List (sort, insert)
+import Data.Tree hiding (Tree)
 import System.Random
 import Data.Array.IO
 
 -- | Simple, recursive Tree data type
 data Tree a = Null | Node a (Tree a) (Tree a)
     deriving (Eq, Show) {- May add a better Show instance -}
-
 
 -- | _O(log n)_ In-order insertion (left-skewed)
 insertT :: (Ord a) => a -> Tree a -> Tree a
