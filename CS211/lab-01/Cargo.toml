@@ -2,3 +2,7 @@
 name = "lab-01"
 version = "0.1.0"
 authors = ["Conor Reynolds <reynolds.conor@gmail.com>"]
+
+[dependencies]
+rand = "0.3.13"
+
