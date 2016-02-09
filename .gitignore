@@ -55,5 +55,6 @@ TODO.md
 
 # Extras
 *.pdf
-/CS211/*.md
+./CS211/*.md
+./CS240/*.md
 

@@ -2,7 +2,6 @@ module Tree where
 
 import Control.Monad
 import Data.List (sort, insert)
-import Data.Tree hiding (Tree)
 import System.Random
 import Data.Array.IO
 
