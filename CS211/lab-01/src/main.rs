@@ -1,6 +1,6 @@
 extern crate rand;
 
-use rand::distributions::{IndependentSample, Range, Normal};
+use rand::distributions::{IndependentSample, Range};
 
 fn main() {
     let mut rng = rand::thread_rng();
