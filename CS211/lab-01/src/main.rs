@@ -1,6 +1,6 @@
 extern crate rand;
 
-use rand::distributions::{IndependentSample, Range};
+use rand::distributions::{IndependentSample, Range, Normal};
 
 fn main() {
     let mut rng = rand::thread_rng();
@@ -32,12 +32,6 @@ fn main() {
 
     println!("Monte Carlo estimate: {}", approx_ans);
     println!("Actual value: {}", exact_ans);
-    println!("Difference: {}", ((approx_ans - exact_ans).abs()));
-
-    // On average, the difference is only approximately 0.0005, so most of
-    // the time, it's reasonable to say that the Monte Carlo algorithm
-    // gives an answer correct to 3 decimal digits. I wouldn't suggest
-    // increasing the number of test cases past 1,000,000, the accuracy
-    // doesn't make up for the computation time.
+    println!("Difference: {}\n", (approx_ans - exact_ans).abs());
 }
 
