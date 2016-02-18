@@ -62,29 +62,49 @@ impl<'a> Node<'a> {
         }
     }
 
-    // Doesn't currently work. Not possible for the function to sometimes
-    // return bool's and sometimes return '()', as in the 'None' sections
-    // of each match.
+    /// Finds the minimum node in a tree
+    pub fn min(&self) -> Option<&Node<'a>> {
+        match self.l {
+            Some(ref subnode) => subnode.min(),
+            None => Some(self),
+        }
+    }
+
+    pub fn delete(&mut self, data: &'a u32) {
+        // Find node
+        // ...
+        // Profit!
+    }
+
+    // TODO: Find an ugly hack or find out what's happening here
     /*
     pub fn is_btree(&self) -> bool {
-        let parent_data = self.data;
-        match self.l {
-            Some(ref subnode) =>
-                if subnode.data < parent_data {
-                    subnode.is_btree()
+        let node = self;
+
+        // This works fine
+        match node.l { _ => {} };
+
+        // Why is it that matching on two values causes issues,
+        // but matching on only one doesn't?
+
+        match (node.l, node.r) {
+            (Some(ref sn1), Some(ref sn2)) =>
+                if sn1.data < node.data && node.data < sn2.data {
+                    sn1.is_btree() && sn2.is_btree()
                 }
                 else { false },
-            None => {},
-        }
-        match self.r {
-            Some(ref subnode) => 
-                if subnode.data > parent_data {
-                    subnode.is_btree()
+            (Some(ref sn1), None) =>
+                if sn1.data < node.data {
+                    sn1.is_btree()
                 }
                 else { false },
-            None => {}
+            (None, Some(ref sn2)) =>
+                if node.data < sn2.data {
+                    sn2.is_btree()
+                }
+                else { false },
+            (None, None) => true,
         }
-        true
     }
     */
 
@@ -142,6 +162,8 @@ fn main() {
     // assert!(x.is_btree());
 
     println!("Raw printing:\n{:?}", x);
+
+    println!("Minimum value: {}", x.min().unwrap().data);
 
     // This should (obviously) have the effect of sorting the list.
     println!("Printing tree in order ...");

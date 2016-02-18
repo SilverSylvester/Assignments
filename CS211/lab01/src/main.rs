@@ -1,13 +1,13 @@
 extern crate rand;
 
-use rand::distributions::{IndependentSample, Range};
+use rand::distributions::{IndependentSample, Range, Normal};
 
 fn main() {
     let mut rng = rand::thread_rng();
     let mut triangles = 0;
     let tcs = 1_000_000;
 
-    // Here we'll assume the first break, 'p', is the largest. To make it
+    // We'll assume the first break, 'p', is the largest. To make it
     // as simple as possible, we'll explicitly declare each side of the
     // triangle and directly verify whether it forms a valid triangle or
     // not. In a sense, this is the 'dumbest' solution to the problem, but
@@ -34,4 +34,3 @@ fn main() {
     println!("Actual value: {}", exact_ans);
     println!("Difference: {}\n", (approx_ans - exact_ans).abs());
 }
-
