@@ -7,7 +7,7 @@ use std::cmp::Ordering::{Less, Equal, Greater};
 // and either a leaf with the character in it, or another HuffTreeBranch.
 
 // TODO: Maybe try to use less confusing names. That, or make the data
-// data structure less clumsy.
+// structure less clumsy.
 pub struct HuffNode {
     weight: usize,
     data: HuffTreeData,
@@ -98,7 +98,7 @@ pub fn huffman(input: &str) -> HuffNode {
     }
 
     // The remaining node is the root node, and the tree is complete.
-    // So we simply need to return the this node.
+    // So we simply need to return this node.
 
     q.pop().unwrap()
 }
