@@ -14,6 +14,7 @@ fn main() {
         };
         let mut s = String::new();
         f.read_to_string(&mut s).expect("Could not read file to string.");
+        // TODO: The tree generation algorithm is a huge bottleneck
         let huff_tree = huffman::gen_tree(&s);
         let mut codes = HashMap::<char, String>::new();
         huffman::gen_codes(&huff_tree, &mut codes, "");

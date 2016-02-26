@@ -58,19 +58,25 @@ pub fn gen_tree(input: &str) -> HuffNode {
     // https://en.wikipedia.org/wiki/Huffman_coding
     
     // Create a leaf for each symbol and add it to the priority queue
-    // So need a list of characters and frequencies. Sounds like a job
-    // for a HashMap.
+    // So need a list of characters and frequencies.
 
+    // TODO: This is the specific bottleneck for the entire process.
+    // Almost the entire time is spent here. This is likely due to the
+    // fact that the hash generation is, by default, cryptographically
+    // secure, and thus quite slow.
     let mut hm = HashMap::new();
     for c in input.chars() {
         *hm.entry(c).or_insert(0) += 1;
     }
 
+    // Everything from here onwards runs effectively instantaneously,
+    // even for enormous files.
+
     // Now we have a HashMap full of (key, val) pairs, which translate
     // to (char, weight) pairs, specifically. Now to create a leaf for
     // each symbol, which we push onto a binary heap via the comparison
     // function we supplied.
-    
+
     let mut q = BinaryHeap::new();
     for (c,w) in hm.iter() {
         let leaf = HuffNode { weight: *w, data: HuffTreeData::Leaf(*c) };
