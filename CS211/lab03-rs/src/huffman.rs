@@ -51,7 +51,8 @@ impl PartialEq for HuffNode {
     }
 }
 
-pub fn huffman(input: &str) -> HuffNode {
+/// Generates Huffman tree
+pub fn gen_tree(input: &str) -> HuffNode {
     
     // I'm pretty much translating this wiki page into Rust:
     // https://en.wikipedia.org/wiki/Huffman_coding

@@ -14,12 +14,12 @@ fn main() {
         };
         let mut s = String::new();
         f.read_to_string(&mut s).expect("Could not read file to string.");
-        let huff_tree = huffman::huffman(&s);
+        let huff_tree = huffman::gen_tree(&s);
         let mut codes = HashMap::<char, String>::new();
         huffman::gen_codes(&huff_tree, &mut codes, "");
 
-        let mut sorted: Vec<_> = codes.iter().collect();
         // Sort by code length
+        let mut sorted: Vec<_> = codes.iter().collect();
         sorted.sort_by(|a, b| a.1.len().cmp(&b.1.len()));
         for (c,code) in sorted {
             println!("{:?}: {}", c, code);
