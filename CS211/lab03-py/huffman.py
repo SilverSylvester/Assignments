@@ -14,7 +14,7 @@ class HuffNode(object):  # pylint: disable=too-few-public-methods
 def gen_tree(string):
     """ Generates Huffman tree """
     # First, generate (char, weight) pairs
-    hm = {}              # pylint: disable=invalid-name
+    hm = {}  # pylint: disable=invalid-name
     for char in string:
         if char in hm:
             hm[char] += 1
@@ -22,8 +22,8 @@ def gen_tree(string):
             hm[char] = 1
 
     # Then create a list of leaves
-    q = []                               # pylint: disable=invalid-name
-    for char, weight in hm.iteritems():  # pylint: disable=invalid-name
+    q = []  # pylint: disable=invalid-name
+    for char, weight in hm.iteritems():
         heapq.heappush(q, (weight, HuffNode(char)))
 
     # While there's more than one node in the queue ...
@@ -44,18 +44,30 @@ def gen_tree(string):
     return heapq.heappop(q)[1]
 
 def gen_codes(hufftree, codes, code_str=""):
-    """ Generates the codes for a Huffman tree """
+    """ Generates the codes for a Huffman tree, stores them in
+        the 'codes' dict ."""
     if hufftree.data is None:
         gen_codes(hufftree.left, codes, code_str + '0')
         gen_codes(hufftree.right, codes, code_str + '1')
     else:
         codes[hufftree.data] = code_str
 
+def encode():
+    """ Does nothing, yet. """
+    return
+
+def print_canonical(string):
+    """ Prints canonical representation of bits """
+    tree = gen_tree(string)
+    codes = {}
+    gen_codes(tree, codes)
+
 # MAIN #
 
 if __name__ == "__main__":
     for fname in sys.argv[1:]:
         with open(fname, 'r') as f:
+            print "\n\t Filename:", fname
             TREE = gen_tree(f.read())
             CODES = {}
             gen_codes(TREE, CODES)

@@ -88,4 +88,3 @@ huffLength c cw =
     sum $ zipWith (*) (map (length . snd) $ sortBy (comparing fst) c)
                       (map snd $ sortBy (comparing fst) cw)
 
-
