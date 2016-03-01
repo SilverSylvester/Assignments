@@ -26,7 +26,7 @@ main = forever $ do
 -- | Get's all possible combinations of available characters in a
 --   string.
 combinations :: String -> [String]
-combinations = nub' . concatMap permutations . subsequences
+combinations = setsort . concatMap permutations . subsequences
 
 -- | Loads a dictionary file for processing
 dictionary :: IO [String]
@@ -53,6 +53,21 @@ scrabbleDraw :: IO String
 scrabbleDraw = liftM (take 7) (shuffle $ replicateEach 5 ['a'..'z'])
     where replicateEach _ []     = []
           replicateEach n (x:xs) = replicate n x ++ replicateEach n xs
+
+-- | Custom mergesort, ignoring duplicate elements on merge.
+setsort :: (Ord a) => [a] -> [a]
+setsort xs
+    | null (tail xs) = xs
+    | otherwise      = merge (setsort ls) (setsort rs)
+    where (ls,rs) = splitAt (length xs `div` 2) xs
+              
+          merge [] ys = ys
+          merge xs [] = xs
+          merge xss@(x:xs) yss@(y:ys) =
+              case compare x y of
+                  LT -> x : merge xs yss
+                  EQ -> x : merge xs ys
+                  GT -> y : merge xss ys
 
 -- | Yucky but effective shuffling algorithm.
 shuffle :: [a] -> IO [a]
