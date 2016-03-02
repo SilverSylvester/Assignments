@@ -1,75 +1,79 @@
+-- | How to cheat at Scrabble, Haskell style!
+
 module Main where
 
+import Control.Arrow ((&&&))
 import Control.Monad
 import Data.Array.IO
-import Data.List
+import Data.Function (on)
+import Data.List (sortBy, sortOn)
 import Data.Ord (comparing)
+import qualified Data.ByteString.Char8 as B
+import qualified Data.HashMap.Lazy as HM
 import System.Exit
 import System.IO
 import System.Random
 
 main = forever $ do
-    ans <- prompt "Random or custom (or quit)? [r/c/q] "
-    chars <- if ans == "r" || ans == "R"
+    -- dictionary <- B.readFile "/home/conor/dictionary.txt"
+    dictionary <- B.readFile "/usr/share/dict/words"
+    ans <- prompt "Random or custom ('q' to quit)? [r|c] "
+    chars <- if ans == "r"
         then scrabbleDraw
         else if ans == "q"
             then exitSuccess
-            else getLine
-    putStrLn $ "Characters: " ++ chars
-    putStrLn "Top 10 suggestions:"
-    dict <- dictionary
-    mapM_ putStrLn
+            else B.getLine
+    putStr $ "Characters: " ++ B.unpack chars ++ "\n"
+    putStrLn "Top ten suggestions:"
+    mapM_ B.putStrLn
         $ take 10
-        $ sortBy (flip $ comparing length)
-        $ findWords (combinations chars) dict
+        $ sortBy (flip $ comparing B.length)
+        $ filter (chars `canForm`) (B.lines dictionary)
 
--- | Get's all possible combinations of available characters in a
---   string.
-combinations :: String -> [String]
-combinations = setsort . concatMap permutations . subsequences
+-- | Gets character counts for each character in a ByteString.
+counts :: B.ByteString -> HM.HashMap Char Int
+counts = HM.fromList . map (B.head &&& B.length) . B.group . B.sort
 
--- | Loads a dictionary file for processing
-dictionary :: IO [String]
-dictionary = liftM lines (readFile "/usr/share/dict/words")
--- dictionary = liftM lines (readFile "/home/conor/dictionary.txt")
+-- | Takes two ByteStrings and checks if some combination of characters
+--   in the first string can form the second string.
+canForm :: B.ByteString -> B.ByteString -> Bool
+canForm = isValid `on` counts
+    where isValid :: HM.HashMap Char Int -> HM.HashMap Char Int -> Bool
+          isValid chars word
+              | null (HM.difference word chars) =
+                  not $ any (< 0) $ diffList (HM.toList chars) (HM.toList word)
+              | otherwise = False
 
--- | Custom nub function (with tighter typeclass constraint). Has
---   the nice (and necessary) side effect of sorting the list.
-nub' :: Ord a => [a] -> [a]
-nub' = map head . group . sort
+-- | Rather involved difference list function. Most of the complexity
+--   is to make sure the correct characters are being compared on each
+--   iteration.
+diffList :: (Eq k, Num v) => [(k, v)] -> [(k, v)] -> [v]
+diffList [] []         = []
+diffList [] ((k,v):ys) = -v : diffList [] ys
+diffList ((k,v):xs) [] =  v : diffList xs []
+diffList ((k,v):xs) yss@((k',v'):ys)
+    | k == k'   = (v - v') : diffList xs ys
+    | otherwise = diffList xs yss
 
--- | Matches two sorted lists and efficiently returns a list of
---   those in the left list that appear in the right list.
-findWords :: Ord a => [a] -> [a] -> [a]
-findWords [] _ = []
-findWords _ [] = []
-findWords (x:xs) (y:ys)
-    | x <  y = findWords xs (y:ys)
-    | x == y = x : findWords xs ys
-    | x >  y = findWords (x:xs) ys
+--------------------------------------
+-- Unecessary but helpful functions --
+--------------------------------------
 
--- | Draws a scrabble 'hand' from a shuffled list of characters.
-scrabbleDraw :: IO String
-scrabbleDraw = liftM (take 7) (shuffle $ replicateEach 5 ['a'..'z'])
+-- | Prompts the user for input in a way that ensures the buffer
+--   is flushed properly every time.
+prompt :: String -> IO String
+prompt msg = do
+    putStr msg
+    hFlush stdout
+    getLine
+
+-- | Draws a random Scrabble hand
+scrabbleDraw :: IO B.ByteString
+scrabbleDraw = liftM (B.pack . take 7) (shuffle $ replicateEach 5 ['a'..'z'])
     where replicateEach _ []     = []
           replicateEach n (x:xs) = replicate n x ++ replicateEach n xs
 
--- | Custom mergesort, ignoring duplicate elements on merge.
-setsort :: (Ord a) => [a] -> [a]
-setsort xs
-    | null (tail xs) = xs
-    | otherwise      = merge (setsort ls) (setsort rs)
-    where (ls,rs) = splitAt (length xs `div` 2) xs
-              
-          merge [] ys = ys
-          merge xs [] = xs
-          merge xss@(x:xs) yss@(y:ys) =
-              case compare x y of
-                  LT -> x : merge xs yss
-                  EQ -> x : merge xs ys
-                  GT -> y : merge xss ys
-
--- | Yucky but effective shuffling algorithm.
+-- | Horrendously non-functional, but effective shuffling algorithm.
 shuffle :: [a] -> IO [a]
 shuffle xs = do
     ar <- newArray n xs
@@ -83,12 +87,4 @@ shuffle xs = do
         n = length xs
         newArray :: Int -> [a] -> IO (IOArray Int a)
         newArray n = newListArray (1,n)
-
--- | Prompts the user for input in a way that ensures the buffer
---   is flushed properly every time.
-prompt :: String -> IO String
-prompt text = do
-    putStr text
-    hFlush stdout
-    getLine
 
