@@ -73,3 +73,9 @@ dist-test
 # TODO file
 TODO.md
 
+# Maths folders
+
+/Analysis/
+/LA/
+/MVC/
+
