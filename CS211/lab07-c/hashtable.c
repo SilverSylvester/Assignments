@@ -20,25 +20,25 @@ static int collisions = 0;
 //  HASHTABLE IMPLEMENTATION //
 /* ------------------------- */
 
-typedef struct hashtable {
+typedef struct Hashtable {
     // Array of strings
     char **table;
     size_t size;
-} hashtable;
+} Hashtable;
 
-hashtable *ht_init(size_t size) {
+Hashtable *ht_init(size_t size) {
     printf("Initialising hashtable ... ");
-    hashtable *ht = malloc(sizeof(hashtable));
+    Hashtable *ht = malloc(sizeof(Hashtable));
     ht->size = size;
     ht->table = malloc(size * sizeof(char *));
     for (int i = 0; i < size; i++) {
-        ht->table[i] = NULL; //malloc((30 + 1) * sizeof(char));
+        ht->table[i] = NULL;
     }
     printf("Done.\n");
     return ht;
 }
 
-void ht_destroy(hashtable *ht) {
+void ht_destroy(Hashtable *ht) {
     for (int i = 0; i < ht->size; i++) {
         free(ht->table[i]);
     }
@@ -65,6 +65,20 @@ u64 fnv1a(char *s) {
 }
 
 /**
+ * Custom hashing function. Relies on the fact
+ * that the only available values are ['a'..'z'].
+ */
+u32 hash(char *s) {
+    u32 pow = 1;
+    u32 hash = 0;
+    for (size_t i = 0; i < strlen(s); i++) {
+        hash += ((s[i] - 'a') * pow);
+        pow *= 26;
+    }
+    return hash;
+}
+
+/**
  * Unsigned 32 bit FNV-1a hashing function.
  */
 u32 fnv1a32(char *s) {
@@ -76,6 +90,9 @@ u32 fnv1a32(char *s) {
     return hash;
 }
 
+/**
+ * Unsigned 32 bit djb2 hashing function.
+ */
 u32 djb2(char *s) {
     u32 hash = 5381;
     int c;
@@ -85,6 +102,11 @@ u32 djb2(char *s) {
 }
 
 #define ROTATE32(x, y) ((x << y) | (x >> (32 - y)))
+
+/**
+ * Third version of the MurmurHash hashing function,
+ * returns a 32 bit unsigned integer.
+ */
 u32 murmur3(char *s) {
     u32 c1 = 0xcc9e2d51;
     u32 c2 = 0x1b873593;
@@ -158,7 +180,7 @@ u32 oaat(char *s) {
  * Best results so far are with the 32 bit FNV-1a
  * hashing algorithm.
  */
-int insert_lp(hashtable *ht, char *val) {
+int insert_lp(Hashtable *ht, char *val) {
     u32 key = fnv1a32(val) % ht->size;
     bool wrapping = false;
     while (ht->table[key] != NULL) {
@@ -180,7 +202,7 @@ int insert_lp(hashtable *ht, char *val) {
 /** 
  * Find value in hashmap via linear probing.
  */
-int find_lp(hashtable *ht, char *val) {
+int find_lp(Hashtable *ht, char *val) {
     u32 key = fnv1a32(val) % ht->size;
     printf("Original key: %u\n", key);
     while (ht->table[key] != NULL) {
@@ -203,7 +225,7 @@ int find_lp(hashtable *ht, char *val) {
  * Best results so far are with the 32 bit FNV-1a
  * hashing algorithm.
  */
-int insert_qp(hashtable *ht, char *val) {
+int insert_qp(Hashtable *ht, char *val) {
     u32 key = fnv1a32(val) % ht->size;
     for (int i = 1; ht->table[key] != NULL; i++) {
         key = (key + i*i) % ht->size;
@@ -218,7 +240,7 @@ int insert_qp(hashtable *ht, char *val) {
 /** 
  * Find value in hashmap via quadratic probing.
  */
-int find_qp(hashtable *ht, char *val) {
+int find_qp(Hashtable *ht, char *val) {
     u32 key = fnv1a32(val) % ht->size;
     printf("Original key: %u\n", key);
     for (int i = 1; ht->table[key] != NULL; i++) {
@@ -242,9 +264,9 @@ int find_qp(hashtable *ht, char *val) {
  * Compute key using one-at-a-time algorithm, compute
  * step using FNV-1a 32 bit hash.
  */
-int insert_dh(hashtable *ht, char *val) {
-    u32 key = oaat(val) % ht->size;
-    u32 step = fnv1a32(val) % (ht->size - 1) + 1;
+int insert_dh1(Hashtable *ht, char *val) {
+    u32 key = hash(val) % ht->size;
+    u32 step = djb2(val) % (ht->size - 1) + 1;
     while (ht->table[key] != NULL) {
         collisions++;
         key = (key + step) % ht->size;
@@ -254,9 +276,43 @@ int insert_dh(hashtable *ht, char *val) {
     return 1;
 }
 
-int find_dh(hashtable *ht, char *val) {
-    u32 key = oaat(val) % ht->size;
-    u32 step = fnv1a32(val) % (ht->size - 1) + 1;
+/**
+ * Find value inserted using one-at-a-time hashing with
+ * FNV-1a 32 bit.
+ */
+int find_dh1(Hashtable *ht, char *val) {
+    u32 key = hash(val) % ht->size;
+    u32 step = djb2(val) % (ht->size - 1) + 1;
+    printf("Original key: %u\n", key);
+    while (ht->table[key] != NULL) {
+        if (strcmp(val, ht->table[key]) == 0) {
+            printf("Found \"%s\" with key %u\n", val, key);
+            return 1;
+        }
+        key = (key + step) % ht->size;
+    }
+    return 0;
+}
+
+int insert_dh2(Hashtable *ht, char *val) {
+    u32 key = fnv1a32(val) % ht->size;
+    u32 step = hash(val) % (ht->size - 1) + 1;
+    while (ht->table[key] != NULL) {
+        collisions++;
+        key = (key + step) % ht->size;
+    }
+    ht->table[key] = malloc(30);
+    strcpy(ht->table[key], val);
+    return 1;
+}
+
+/**
+ * Find value inserted using one-at-a-time hashing with
+ * FNV-1a 32 bit.
+ */
+int find_dh2(Hashtable *ht, char *val) {
+    u32 key = fnv1a32(val) % ht->size;
+    u32 step = hash(val) % (ht->size - 1) + 1;
     printf("Original key: %u\n", key);
     while (ht->table[key] != NULL) {
         if (strcmp(val, ht->table[key]) == 0) {
@@ -282,12 +338,12 @@ int main(int argc, char **argv) {
 
     // Initialise hashtable with size HT_MAX_SIZE
     // as defined above.
-    hashtable *ht = ht_init(HT_MAX_SIZE);
+    Hashtable *ht = ht_init(HT_MAX_SIZE);
 
     FILE *fp;
     char line[30];
 
-    fp = fopen("/home/conor/dictionary.txt", "r");
+    fp = fopen("/home/conor/random_dict.txt", "r");
     if (fp == NULL) {
         printf("File read failed\n");
         exit(1);
@@ -342,7 +398,7 @@ prompt:
             st = clock();
             int i = 0;
             while (fgets(line, sizeof(line), fp)) {
-                insert_dh(ht, trim(line));
+                insert_dh2(ht, trim(line));
             }
             tt = clock() - st;
 
@@ -353,7 +409,7 @@ prompt:
             printf("Enter a word to search: ");
             scanf("%s", word);
 
-            if (find_dh(ht, word) == 0)
+            if (find_dh2(ht, word) == 0)
                 printf("Could not find \"%s\"\n", word);
 
             break;
