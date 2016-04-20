@@ -22,10 +22,14 @@ fn main() {
     let mut counter = 0;
     for _ in 0..tcs {
         match interrupted_roll(6, 6) {
-            Some(v) => {
-                roll_lengths += v.len();
+            // All conditions were satisfied, so we record
+            // the result.
+            Some(rolls) => {
+                roll_lengths += rolls.len();
                 counter += 1;
             },
+            // One or more conditions were not satisfied,
+            // so we do not record the result.
             None => continue,
         };
     }
@@ -64,6 +68,10 @@ fn interrupted_roll(die_max: usize, until: usize) -> Option<Vec<usize>> {
     let mut rolls: Vec<usize> = Vec::new();
     let mut rng = thread_rng();
     let (mut sneezed, mut snap) = (false, false);
+    
+    // The given number of test cases is not enough to properly
+    // handle these extremely low probabilities, reduce them
+    // for more consistent results.
     let sneeze_range = Range::new(0, 40000);
     let snap_range = Range::new(0, 100);
     
