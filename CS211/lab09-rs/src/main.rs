@@ -1,7 +1,7 @@
 extern crate rand;
 
 use rand::{ thread_rng, Rng };
-use rand::distributions::{ Range, IndependentSample };
+use std::process::Command;
 
 fn main() {
     // Test cases
@@ -18,15 +18,18 @@ fn main() {
 
     /* --- INTERRUPTED ROLL --- */
 
+    println!("Progress: -------------------|");
+
     roll_lengths = 0;
     let mut counter = 0;
-    for _ in 0..tcs {
+    while counter < 100 {
         match interrupted_roll(6, 6) {
             // All conditions were satisfied, so we record
             // the result.
             Some(rolls) => {
                 roll_lengths += rolls.len();
                 counter += 1;
+                progress(counter + 1, 100);
             },
             // One or more conditions were not satisfied,
             // so we do not record the result.
@@ -69,21 +72,18 @@ fn interrupted_roll(die_max: usize, until: usize) -> Option<Vec<usize>> {
     let mut rng = thread_rng();
     let (mut sneezed, mut snap) = (false, false);
     
-    // The given number of test cases is not enough to properly
-    // handle these extremely low probabilities, reduce them
-    // for more consistent results.
-    let sneeze_range = Range::new(0, 40000);
-    let snap_range = Range::new(0, 100);
+    let sneeze_prob = 1.0/40000.0;
+    let snap_prob = 1.0/100.0;
     
     // We continuously roll the die until a certain desired value
     // is reached.
     loop {
         // If you sneeze, mark sneezed as true
-        if sneeze_range.ind_sample(&mut rng) == 0 {
+        if rng.gen_range(0.0, 1.0) < sneeze_prob {
             sneezed = true;
         }
         // If you recieve a snap, mark snap as true
-        else if snap_range.ind_sample(&mut rng) == 0 {
+        if rng.gen_range(0.0, 1.0) < snap_prob {
             snap = true;
         }
         // Roll die (shadows roll function)
@@ -100,5 +100,39 @@ fn interrupted_roll(die_max: usize, until: usize) -> Option<Vec<usize>> {
     // Only record the results if you sneezed and recieved a snap
     if sneezed && snap { Some(rolls) }
     else { None }
+}
+
+fn print_same_line(msg: &str) {
+    Command::new("echo")
+            .arg("-ne")
+            .arg(&("\r".to_string() + msg))
+            .status()
+            .unwrap_or_else(|_| {
+                panic!("Failed to execute process")
+            });
+}
+
+fn continue_line(msg: &str) {
+    Command::new("echo")
+            .arg("-ne")
+            .arg(msg)
+            .status()
+            .unwrap_or_else(|_| {
+                panic!("Failed to execute process")
+            });
+}
+
+fn progress(current: usize, finished: usize) {
+    if current <= finished {
+        let prog = 20_f32 * current as f32 / finished as f32;
+        let percentage = 100_f32 * current as f32 / finished as f32;
+        print_same_line(&(percentage.to_string() + "%\t  "));
+        for _ in 0..(prog.floor() as usize) {
+            continue_line("#");
+        }
+    }
+    else {
+        println!("");
+    }
 }
 
